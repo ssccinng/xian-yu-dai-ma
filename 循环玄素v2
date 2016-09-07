@@ -1,0 +1,81 @@
+#include<stdio.h>
+#include<math.h>
+	int main(){
+		int isprime = 1;
+		int x = 3;
+		int cnt = 1;
+		int max;
+		scanf("%d",&max);
+		for(;x < max;x += 2){
+			isprime = 1;
+			int counter = 1;
+			int t = x;
+			while(x > 10){
+				int yu;
+				yu = x % 10;
+				x /= 10;
+				counter++;
+				if(yu % 2 == 0||x % 2 == 0||yu % 5 == 0||x % 5 == 0){
+					isprime = 0;
+					break;
+				}
+			}				
+			x = t;
+			if(isprime){
+				for(int i = 2,isprime = 1;i < sqrt(x) + 1;i++){
+//					isprime = 1;
+					if(x%i == 0){
+						isprime = 0;
+						break;
+					}
+				}
+					if(x > 10){
+//					if(isprime){
+//						int counter = 1;
+//						int t = x;
+//						while(x > 10){
+//							int yu;
+//							yu = x % 10;
+//							x /= 10;
+//							counter++;
+//							if(yu % 2 == 0||x % 2 == 0||yu % 5 == 0||x % 5 == 0){
+//								isprime = 0;
+//								break;
+//							}
+//						}
+//						x = t;
+						while(isprime){
+							int yu = x % 10;
+							x /= 10;
+							x += yu*pow(10,counter-1);
+							if( x!=t){
+								for(int i = 2,isprime = 1;i < sqrt(x) + 1;i += 2){
+									if(x%i == 0){
+									isprime = 0;
+									break;
+									}
+								}
+
+							}else{
+								break;
+							}
+						}
+						x = t;
+						if(isprime){
+							cnt++;
+//							printf("%d ",x);
+						}
+//					}
+				}else{
+					if(isprime){
+						cnt++;
+					}
+				}
+			}
+		}
+			if(max < 3){
+				cnt--;
+			}
+		printf("%d",cnt);
+		return 0;
+	} 
