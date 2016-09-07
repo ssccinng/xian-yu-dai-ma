@@ -1,0 +1,57 @@
+#include<stdio.h>
+#include<stdlib.h>
+	int main(){
+		int chunk_range;
+		int x,y,z;
+		printf("请输入你希望的中心所在坐标 x y z，y值请输入希望被mark的y值\n");
+		scanf("%d %d %d",&x,&y,&z);
+		x = x/16*16;
+		z = z/16*16;
+		printf("请输入需要mark的区块数,如3*3输入3,16*16输入16\n");
+		scanf("%d",&chunk_range);
+		int x1,z1,x2,z2;
+		int chunk_long;
+		chunk_long = chunk_range/2*16;
+		x1 = x - chunk_long;
+		z1 = z - chunk_long;
+		x2 = x + chunk_long;
+		z2 = z + chunk_long;
+		if(chunk_range%2){
+			x2 += 16;
+			z2 += 16;
+		} 
+		int flag = 1;
+		int t = z1 ;
+		while(x1 < x2){
+			while(z1 < z2){
+				printf("init:/fill %d %d %d %d %d %d ",x1,y,z1,x1+16,y,z1+16);
+				z1 += 16;
+				if((x1/16%2 == 0)!=(z1/16%2 == 0)){
+					printf("iron_block\n");
+//					flag = 0;
+				}else{
+					printf("gold_block\n");
+//					flag = 1;
+				}
+			}
+//			if(chunk_range%2 == 0){
+//				if(flag){
+//					flag = 0;
+//				}else{
+//					flag = 1;
+//				}
+//			}
+			x1 += 16;
+			z1 = t;
+//			if(flag){
+//					printf("iron_block\n");
+//					flag = 0;
+//				}else{
+//					printf("gold_block\n");
+//					flag = 1;
+//		}
+		
+		}
+		system("pause");
+		return 0;
+	}
