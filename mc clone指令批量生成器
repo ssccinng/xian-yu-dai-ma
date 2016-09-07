@@ -1,0 +1,88 @@
+#include<stdio.h>
+#include<stdlib.h> 
+//	int x1,y1,z1;
+//	int x2,y2,z2;
+//	int x3,y3,z3;
+//	void clone(int a,int b, int c);
+	int main(){
+		int x1,y1,z1;
+		int x2,y2,z2;
+		int x3,y3,z3;
+		int x4,y4,z4;
+		int t;
+		int dx,dy,dz;
+		int type;
+		printf("请输入x1，y1，z1:\n");
+		scanf("%d %d %d",&x1,&y1,&z1);
+		printf("请输入x2，y2，z2:\n");
+		scanf("%d %d %d",&x2,&y2,&z2);
+		printf("请输入x3，y3，z3:\n");
+		scanf("%d %d %d",&x3,&y3,&z3);
+		printf("请输入x4，y4，z4:\n");
+		scanf("%d %d %d",&x4,&y4,&z4);
+		if(x1 > x2){
+			t = x1;
+			x1 = x2;
+			x2 = t;
+		}
+		dx = x2 - x1 + 1;
+		if(y1 > y2){
+			t = y1;
+			y1 = y2;
+			y2 = t;
+		}
+		dy = y2 - y1+1;
+		if(z1 > z2){
+			t = z1;
+			z1 = z2;
+			z2 = t;
+		}
+		dz = z2 - z1 + 1;
+		if(x3 > x4){
+			t = x3;
+			x3 = x4;
+			x4 = t;
+			}
+		if(y3 > y4){
+			t = y3;
+			y3 = y4;
+			y4 = t;
+			}
+		if(z3 > z4){
+			t = z3;
+			z3 = z4;
+			z4 = t;
+		}
+		printf("请选择复制方向，x方向请输入1，y方向请输入2，z方向请输入3\n");
+		scanf("%d",&type); 
+		switch(type){
+		case 1:
+			while(x3 <= x4){
+			printf("init:/clone %d %d %d %d %d %d %d %d %d\n",x1,y1,z1,x2,y2,z2,x3,y3,z3);
+			x3 += dx;
+		}
+			break;
+		case 2:
+
+			while(y3 <= y4){
+			printf("init:/clone %d %d %d %d %d %d %d %d %d\n",x1,y1,z1,x2,y2,z2,x3,y3,z3);
+			y3 += dy;
+		}
+			break;
+		case 3:
+			while(z3 <= z4){
+			printf("init:/clone %d %d %d %d %d %d %d %d %d\n",x1,y1,z1,x2,y2,z2,x3,y3,z3);
+			z3 += dz;
+			}
+			break;
+	}
+		system("pause");
+		return 0;
+	}
+//	void clone(int a,int b,int c){
+//		while(a <= b){
+//			printf("/clone %d %d %d %d %d %d %d %d %d\n",x1,y1,z1,x2,y2,z2,a,b,);
+//			a+=c;
+//		}
+//	}
+//	
