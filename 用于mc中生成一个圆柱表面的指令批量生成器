@@ -1,0 +1,21 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+	int main(){
+		int i,j;
+		int x,y,z;
+		printf("请输入中心点坐标 x z，y值请输入期望所在的y值\n");
+		scanf("%d %d %d",&x,&y,&z);
+		int rad;
+		printf("请输入该圆半径r:\n");
+		scanf("%d",&rad);
+		for(i = x - rad;fabs(i - x) <= rad;i++){
+			for(j = z - rad;fabs(j - z)<= rad;j++){
+				if(rad <= sqrt((i - x)*(i - x)+(j - z)*(j - z))&&sqrt((i - x)*(i - x)+(j - z)*(j - z)) < rad + 1){
+					printf("init:/fill %d %d %d %d 255 %d iron_block\n",i,y,j,i,j);
+				}
+			}
+		}
+		system("pause");
+		return 0; 
+	} 
