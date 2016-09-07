@@ -1,0 +1,38 @@
+#include<stdio.h>
+	void update(int redstone_wire[17],int a);
+	int main(){
+		int redstone_wire[] = {0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+		update(redstone_wire,1);
+		return 0;
+	}
+	void update(int redstone_wire[17],int a){
+		int max;
+		int flag = 0;
+		if (redstone_wire[a] > 0&&a != 0&&a != 17){
+			if (redstone_wire[a - 1] > redstone_wire[a + 1]){
+				max = redstone_wire[a - 1];
+			}else{
+				max = redstone_wire[a + 1];
+			}
+			int t = redstone_wire[a];
+			if (max > 0){
+				redstone_wire[a] = max - 1;
+				flag = 1;
+				if (t == max - 1){
+					flag = 0;
+				}
+			}else{
+				redstone_wire[a] = 0;
+			}
+			for (int i = 0;i < 17;i++){
+				printf("%2d ",redstone_wire[i]);
+			}
+			printf("\n");
+			if (a < 16&&flag){
+				update(redstone_wire,a + 1);
+			}
+			if (a > 0&&flag){
+				update(redstone_wire,a - 1);
+			}
+		}
+	}
