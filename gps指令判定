@@ -1,0 +1,52 @@
+    #include<stdio.h>
+    #include<string.h>
+            int ssj10(char * p){
+            int Goku = 0;
+            int cnt = 2;
+            while (cnt--){
+                    Goku = Goku*10 + *p++ - '0';
+            }
+            return Goku;
+        }
+        int main(){
+            int UTC_h,UTC_m,UTC_s;
+            char GPS[1000] = "";
+            char *p;
+            int x,y;
+            do{
+                scanf("%s",GPS);
+    //            char headline[7];
+    //            strncpy(headline,GPS,6);
+                if (strncmp(GPS,"$GPRMC",6) == 0&&GPS[17] == 'A'){ 
+                    x = 0;
+                    y = 71;
+                    for (int i = 2;GPS[i] != '*';i++){
+                        y ^= GPS[i];
+                    }
+                    y %= 65535;
+                    p = strrchr(GPS,'*') + 1;
+                    while (*p != 0){
+                        if(*p <= '9'){
+                            x = x * 16 + *p - '0';
+                        }else{
+                            x = x * 16 + *p - 55;
+                        }
+                        p++;
+                    }
+                    if (x == y){
+                        p = &GPS[7]; 
+                        UTC_h = ssj10(p);
+                        p += 2;
+                        UTC_m = ssj10(p);
+                        p += 2;
+                        UTC_s = ssj10(p);
+                        UTC_h += 8;
+                        if (UTC_h >= 24){
+                            UTC_h -= 24;
+                        }
+                    }
+                }
+            }while(strcmp(GPS,"END"));
+            printf("%02d:%02d:%02d",UTC_h,UTC_m,UTC_s);
+            return 0;
+        }
