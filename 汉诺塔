@@ -1,0 +1,16 @@
+#include<stdio.h>
+	void haio(char A,char B,char C,int n){
+		if (n > 1){
+			haio(A,C,B,n-1);
+			printf("Move %c to %c\n",A,C);
+			haio(B,A,C,n-1);
+		}else{
+			printf("Move %c to %c\n",A,C);
+		}
+	}
+	int main(){
+		int n;
+		scanf("%d",&n);
+		haio('A','B','C',n);
+		return 0;
+	}
