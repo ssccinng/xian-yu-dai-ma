@@ -1,0 +1,66 @@
+#include<stdio.h>
+#include<stdlib.h> 
+	void zqd(int N,int kirby[N][N],int t,int zjl,int *p);
+	int main(){
+		FILE* fp = fopen("行列式.doc","a");
+		if (fp){
+			int N;
+			printf("请输入将要输入几阶矩阵N：");
+			scanf("%d",&N);
+			fprintf(fp,"该%d阶矩阵为\n",N);
+			if (N != 1){
+				int kirby[N][N];
+				for (int i = 0;i < N;i++){
+					for (int j = 0;j < N;j++){
+						scanf("%d",&kirby[i][j]);
+						fprintf(fp,"%d\t",kirby[i][j]);
+						if (j == N - 1){
+							fprintf(fp,"\n\n");
+						}
+					}
+				}
+				int t = 1;
+				int zjl = 1; 
+				int zqy = 0;
+				int *p = &zqy;
+				zqd(N,kirby,t,zjl,p);
+				printf("该矩阵行列式为：%d\n",*p);
+				fprintf(fp,"该矩阵行列式为：%d\n\n\n",*p);
+			}else{
+				int xr;
+				scanf("%d",&xr);
+				printf("%d",xr);
+			}
+		}else{
+			printf("出错啦！\n"); 
+		}
+		system("pause");
+		return 0;
+	}
+	void zqd(int N,int kirby[N][N],int t,int zjl,int *p){
+		if (N > 2){
+			for (int i = 0;i < N;i++){
+				if (i % 2){
+					t = -zjl * kirby[0][i];
+				}else{
+					t = zjl * kirby[0][i];
+				} 
+				int k = 0;
+				int gr[N - 1][N - 1];
+				for (int j = 0;j < N;j++){//列输入为新数组并去掉一行 
+					if (j == i){
+						continue;
+					}else{
+						for (int o = 0;o < N - 1;o++){
+							gr[o][k] = kirby[o + 1][j];
+						}
+					}
+					k++;
+				}
+				zqd(N - 1,gr,t,t,p);
+			}
+		}else{
+			*p += t * kirby[0][0] * kirby[1][1];
+			*p -= t * kirby[0][1] * kirby[1][0];
+		}
+	}
