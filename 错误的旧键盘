@@ -1,0 +1,24 @@
+#include<stdio.h>
+#include<string.h>
+	int main(){
+		int kirby[96] = {0};
+		char n;
+		while ((n = getchar()) != '\n'){
+			if ('a' <= n&&n <= 'z'){
+				n -= 32;
+			}
+			kirby[(int)n] = 1;
+		}
+		while ((n = getchar()) != '\n'){
+			if ('a' <= n&&n <= 'z'){
+				n -= 32;
+			}
+			kirby[(int)n] = 0;
+		}
+		for (int i = 0;i < 96;i++){
+			if (kirby[i]){
+				printf("%c",i);
+			}
+		}
+		return 0;
+	}
