@@ -1,0 +1,70 @@
+#include<stdio.h>
+#include<math.h>
+ 
+int isprime(int x) {
+    int flag = 1;
+    if ((x != 2 && x % 2 == 0) || x == 1) {
+        return 0;
+    }
+    if (x != 2 && x != 3) {
+        for (int i = 3; i < sqrt(x) + 1; i += 2) {
+            if (x % i == 0) {
+                flag = 0;
+                break;
+            }
+        }
+    }
+    return flag;
+}
+ 
+int main() {
+    int n, a;
+    scanf("%d", &n);
+    while (n--) {
+        scanf("%d", &a);
+        if (a == 1) {
+            printf("2\n3\n5\n7\n");
+            continue;
+        }
+        int first = (int)pow(10, a - 1);
+        int check = 1;
+        while (1) {
+            while (1) {
+                if (check == 9) {
+                    break;
+                }
+                if (isprime(check) == 0) {
+                    if (check % 10 == 9 && check > 10) {
+                        check /= 10;
+                        check++;
+                        while (check % 10 == 0) {
+                            check /= 10;
+                        }
+                        continue;
+                    }
+                    check += 1;
+                }
+                else {
+                    check *= 10;
+                    if (check > first) {
+                        break;
+                    }
+                }
+            }
+            if (check == 9) {
+                break;
+            }
+            for (int i = 1; i < 10; i += 2) {
+                if (isprime(check + i)) {
+                    printf("%d\n", check + i);
+                }
+            }
+            check /= 10;
+            check++;
+            while (check % 10 == 0) {
+                check /= 10;
+            }
+        }
+    }
+    return 0;
+}
