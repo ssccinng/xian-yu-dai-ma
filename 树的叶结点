@@ -1,0 +1,87 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct zqd {
+	int left, right;
+} kirby;
+typedef struct que {
+	int check;
+	struct que * Next;
+} queue;
+
+queue * add(queue * last, int next) {
+	last->check = next;
+	last->Next = (queue*)malloc(sizeof(queue));
+	last = last->Next;
+	last->Next = NULL;
+	return last;
+}
+queue * push(queue * head, int * now) {
+	*now = head->check;
+	queue * t = head->Next;
+	free(head);
+	return t;
+}
+
+int main(int argc, char * argv[]) {
+	int n;
+	scanf("%d", &n);
+	getchar();
+	kirby * zqy;
+	zqy = (kirby*)malloc(n * sizeof(kirby));
+	int root = (n - 1) * n / 2;
+	char a, b;
+	for (int i = 0; i < n; i++) {
+		scanf("%c %c", &a, &b);
+		getchar();
+		if (a == '-') {
+			zqy[i].left = -1;
+		}
+		else {
+			zqy[i].left = a - '0';
+			root -= zqy[i].left;
+		}
+		if (b == '-') {
+			zqy[i].right = -1;
+		}
+		else {
+			zqy[i].right = b - '0';
+			root -= zqy[i].right;
+		}
+	}
+	queue * head = (queue*)malloc(sizeof(queue));
+	queue * last = head;
+	last = add(last, root);
+	int now;
+	int cnt = 1;
+	int flag1, flag2;
+	while (1) {
+		flag1 = flag2 = 0;
+		head = push(head, &now);
+		if (zqy[now].left == -1) {
+			flag1 = 1;
+		}
+		else {
+			last = add(last, zqy[now].left);
+		}
+		if (zqy[now].right == -1) {
+			flag2 = 1;
+		}
+		else {
+			last = add(last, zqy[now].right);
+		}
+		if (flag1&&flag2) {
+			if (cnt) {
+				cnt = 0;
+				printf("%d", now);
+			}
+			else {
+				printf(" %d", now);
+			}
+		}
+		if (head->Next == NULL) {
+			break;
+		}
+	}
+	return 0;
+}
