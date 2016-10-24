@@ -1,0 +1,80 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct zqd {
+	int mess;
+	struct zqd *left, *right;
+} zqy;
+
+void add(zqy ** head, int message) {
+	zqy ** test = head;
+	while (*test != NULL) {
+		if (message > (*test)->mess) {
+			test = &((*test)->right);
+		}
+		else {
+			test = &((*test)->left);
+		}
+	}
+	*test = (zqy*)malloc(sizeof(zqy));
+	(*test)->mess = message;
+	(*test)->left = (*test)->right = NULL;
+}
+int cmp(zqy * head1, zqy * head2) {
+	if (head1 == NULL&&head2 == NULL) {
+		return 1;
+	}
+	if ((head1 == NULL&&head2 != NULL) || (head1 != NULL&&head2 == NULL)) {
+		return 0;
+	}
+	if (head1->mess != head2->mess) {
+		return 0;
+	}
+	else {
+		return cmp(head1->left, head2->left) && cmp(head1->right, head2->right);
+	}
+}
+void Free(zqy * head) {
+	if (head != NULL) {
+		Free(head->left);
+		Free(head->right);
+		free(head);
+	}
+}
+
+int main() {
+	int a, b;
+	while (1) {
+		scanf("%d", &a);
+		if (a != 0) {
+			scanf("%d", &b);
+		}
+		else {
+			break;
+		}
+		zqy *head1 = NULL, *head2 = NULL;
+		int mess;
+		for (int i = 0; i < a; i++) {
+			scanf("%d", &mess);
+			add(&head1, mess);
+		}
+		for (int j = 0; j < b; j++) {
+			for (int i = 0; i < a; i++) {
+				scanf("%d", &mess);
+				add(&head2, mess);
+			}
+			int flag = cmp(head1, head2);
+			if (flag) {
+				printf("Yes\n");
+			}
+			else {
+				printf("No\n");
+			}
+			Free(head2);
+			head2 = NULL;
+		}
+		Free(head1);
+		head1 = NULL;
+	}
+	return 0;
+}
