@@ -1,0 +1,34 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+int kirby[16];
+
+typedef struct tree_bin{
+	int message;
+	struct tree_bin *left, *right;
+} tree_line;
+
+int create(tree_line ** root, int head, int tail);
+
+int main() {
+	for (int i = 0; i < 16; i++){
+		kirby[i] = i + 1;
+	}
+	tree_line * root = (tree_line*)malloc(sizeof(tree_line));
+	create(&root, 0, 16);
+	printf("%d", root->message);
+	return 0;
+}
+
+int create(tree_line ** root, int head, int tail) {
+	if (tail - head == 1){
+		(*root)->message = kirby[head];
+		(*root)->left = (*root)->right = NULL;
+		return (*root)->message;
+	}
+	else{
+		(*root)->left = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->right = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->message = create(&((*root)->left), head, (head + tail) / 2) + create(&((*root)->right), (head + tail) / 2, tail);
+	}
+}
