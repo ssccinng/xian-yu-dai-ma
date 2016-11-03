@@ -1,0 +1,48 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define scanf_s scanf
+ 
+typedef struct tree_bin {
+    int mem;
+    struct tree_bin * father;
+} all_tree;
+ 
+int main(int argc, char * argv[]) {
+    int T;
+    scanf_s("%d", &T);
+    while (T--) {
+        int N, M, x, y;
+        scanf("%d %d", &N, &M);
+        all_tree * kirby = (all_tree*)malloc(N * sizeof(all_tree));
+        for (int i = 0; i < N; i++) {
+            kirby[i].mem = 1;
+            kirby[i].father = NULL;
+        }
+        all_tree * temp;
+        all_tree * zqd;
+        all_tree * gr;
+        for (int i = 0; i < M; i++) {
+            scanf("%d %d", &x, &y);
+            zqd = &kirby[x];
+            while (zqd->father != NULL) {
+                zqd = zqd->father;
+            }
+            temp = &(kirby[y]);
+            while (temp->father != NULL) {
+            	gr = temp;
+                temp = &(*temp->father);
+                gr->father = zqd;
+            }
+            if (zqd == temp) {
+                printf("Invalid!\n");
+                continue;
+            }
+            temp->father = zqd;
+            int t = temp->mem;
+            temp->mem = 1;
+            zqd->mem += t;
+            printf("%d\n", zqd->mem);
+        }
+    }
+    return 0;
+}
