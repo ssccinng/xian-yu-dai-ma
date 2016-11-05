@@ -1,0 +1,185 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#include<stdbool.h>
+#define scanf scanf_s
+
+typedef struct tree_bin {
+	long long int message;				/*节点信息,线段和*/
+	int ll, rr;							/*左端点&右端点*/
+	int sqrt_lazy;						/*lazy标记*/
+	bool _10_;							/*判子树元素是否全为1*/
+	struct tree_bin *left, *right;		/*指向左右儿子的指针*/
+} tree_line;
+
+long long int Insert(long long int * kirby, tree_line ** root, int head, int tail);					/*建立线段树*/
+void lazy(tree_line * root, int head, int tail);													/*打lazy标记*/
+void updata(tree_line * root, int head, int tail);													/*寻找需要更新的开始位置*/
+long long int Deep_updata(tree_line * root, int head, int tail, int n);								/*实际用于更新节点的函数*//*p.s.我觉得这里lazy有bug，没修好*/
+long long int find(tree_line * root, int head, int tail);											/*寻找并拿出所需的值*/
+void Free(tree_line * root);																		/*删除树*/
+
+int main(int argc, char * argv[]) {
+	int T;
+	scanf("%d", &T);
+	for (int i = 1; i <= T; i++) {
+		printf("Case #%d:\n", i);
+		int n;
+		scanf("%d", &n);
+		tree_line * root = (tree_line*)malloc(sizeof(tree_line));									/*新建根节点*/
+		long long int * kirby;																		/*开数组*/
+		kirby = (long long int*)malloc(n * sizeof(long long int));
+		for (int i = 0; i < n; i++) {
+			scanf("%lld", &kirby[i]);
+		}
+		Insert(kirby, &root, 0, n);
+		int m;
+		scanf("%d", &m);
+		while (m--) {
+			int type, l, r;
+			int t;
+			scanf("%d %d %d", &type, &l, &r);
+			if (l > r) {
+				t = r;
+				r = l;
+				l = t;
+			}
+			if (type == 1) {
+				updata(root, l - 1, r);																/*更新需要用到的节点*/
+				printf("%lld\n", find(root, l - 1, r));
+			}
+			else {
+				lazy(root, l - 1, r);																/*打lazy标记*/
+			}
+		}
+		free(kirby);
+		Free(root);
+	}
+	return 0;
+}
+
+long long int Insert(long long int * kirby, tree_line ** root, int head, int tail) {				/*建立线段树*/
+	tree_line ** temp = root;
+	(*temp)->ll = head;
+	(*temp)->rr = tail;
+	(*temp)->sqrt_lazy = 0;
+	if (tail - 1 == head) {																			/*当线段长度为1时,赋值并返回,并检查是否为1*/
+		(*temp)->message = kirby[head];
+		(*temp)->_10_ = (*temp)->message == 1 ? false : true;
+		(*temp)->left = (*temp)->right = NULL;
+		return (*temp)->message;
+	}
+	else {
+		(*root)->left = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->right = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->message = Insert(kirby, &((*root)->left), head, (head + tail) / 2) + 
+			Insert(kirby, &((*root)->right), (head + tail) / 2, tail);								/*得到当前节点的值*/
+		//(*temp)->_10_ = (*temp)->message == tail - head ? false : true;						
+		if ((*temp)->left->_10_ || (*temp)->right->_10_) {											/*当两个子树的子树全为1时,该节点也不需要打lazy*/
+			(*temp)->_10_ = true;
+		}
+		else {
+			(*temp)->_10_ = false;
+		}
+		return (*root)->message;
+	}
+}
+
+void lazy(tree_line * root, int head, int tail) {													/*打lazy标记*/
+	tree_line * temp = root;
+	if (temp->_10_) {
+		if (head >= temp->rr || tail <= temp->ll) {													/*当所需线段与当前线段完全无交集return*/
+			return;
+		}
+		else if ((head <= temp->ll&&tail >= temp->rr)) {
+			temp->sqrt_lazy++;
+			return;
+		}
+		else {
+			lazy(temp->left, head, tail);															/*递归检测左右子树*/
+			lazy(temp->right, head, tail);
+		}
+	}
+	else {
+		return;
+	}
+}
+
+void updata(tree_line * root, int head, int tail) {													/*寻找需要更新的开始位置*/
+	tree_line * temp = root;
+	if (temp->_10_) {																				/*如为false则直接返回当前节点信息*/
+
+	}
+	else {
+		return;
+	}
+	if (head >= temp->rr || tail <= temp->ll) {														/*当所需线段与当前线段完全无交集return*/
+		return;
+	}
+	else if ((head <= temp->ll&&tail >= temp->rr)) {
+		Deep_updata(temp, temp->ll, temp->rr, temp->sqrt_lazy);										/*开始更新*/
+		return;
+	}
+	else {
+		temp->left->sqrt_lazy += temp->sqrt_lazy;
+		temp->right->sqrt_lazy += temp->sqrt_lazy;
+		temp->sqrt_lazy = 0;
+		updata(temp->left, head, tail);																/*递归检测左右子树*/
+		updata(temp->right, head, tail);
+	}
+}
+
+long long int Deep_updata(tree_line * root, int head, int tail, int n) {							/*实际用于更新节点的函数*//*p.s.我觉得这里lazy有bug，没修好*/
+	tree_line * temp = root;
+	temp->sqrt_lazy = 0;																			/*lazy置0*//*p.s.咳咳,估计有问题*/
+	if (temp->_10_) {																				/*如为false则直接返回当前节点信息*/
+
+	}
+	else {
+		return temp->message;																		
+	}
+	if (temp->ll == temp->rr - 1) {																	/*当线段长度为1时更新节点并返回值*/
+		for (int i = 0; i < n; i++) {
+			temp->message = (long long int)sqrt(temp->message);										/*开方开方开方开方*/
+		}
+		if (temp->message == 1){																	
+			temp->_10_ = false;																		/*元素为1时标记为不需要更新*/
+		}
+		return temp->message;
+	}
+	else {
+		temp->message = Deep_updata(temp->left, head, tail, n + temp->left->sqrt_lazy) +			/*警察叔叔就是他！*//*bugbugbugbug*/
+			Deep_updata(temp->right, head, tail, n + temp->right->sqrt_lazy);
+		/*temp->_10_ = temp->message == temp->rr - temp->ll ? false : true;*/
+		if (temp->left->_10_ || temp->right->_10_) {												/*当两个子树的子树全为1时,该节点也不需要打lazy*/
+			temp->_10_ = true;
+		}
+		else {
+			temp->_10_ = false;
+		}
+		return temp->message;
+	}
+}
+
+long long int find(tree_line * root, int head, int tail) {											/*寻找并拿出所需的值*/
+	tree_line * temp = root;
+	if (head >= temp->rr || tail <= temp->ll) {														/*当所需线段与当前线段完全无交集return*/
+		return 0;
+	}
+	else if ((head <= temp->ll&&tail >= temp->rr)) {
+		return temp->message;
+	}
+	else {
+		return find(temp->left, head, tail) + find(temp->right, head, tail);						/*递归检测左右子树*/
+	}
+}
+
+void Free(tree_line * root) {																		/*删除树*/
+	if (root->left != NULL) {
+		Free(root->left);
+	}
+	if (root->right != NULL) {
+		Free(root->right);
+	}
+	free(root);
+}
