@@ -1,0 +1,160 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#include<stdbool.h>
+#define scanf scanf_s
+
+typedef struct tree_bin {
+	long long int message;
+	int ll, rr;
+	int sqrt_lazy;
+	bool _10_;
+	struct tree_bin *left, *right;
+} tree_line;
+
+long long int Insert(long long int * kirby, tree_line ** root, int head, int tail);
+void lazy(tree_line * root, int head, int tail);
+void updata(tree_line * root, int head, int tail);
+long long int Deep_updata(tree_line * root, int head, int tail, int n);
+long long int find(tree_line * root, int head, int tail);
+void Free(tree_line * root);
+
+int main(int argc, char * argv[]) {
+	int T;
+	scanf("%d", &T);
+	for (int i = 1; i <= T; i++) {
+		printf("Case #%d:\n", i);
+		int n;
+		scanf("%d", &n);
+		tree_line * root = (tree_line*)malloc(sizeof(tree_line));
+		long long int * kirby;
+		kirby = (long long int*)malloc(n * sizeof(long long int));
+		for (int i = 0; i < n; i++) {
+			scanf("%lld", &kirby[i]);
+		}
+		Insert(kirby, &root, 0, n);
+		int m;
+		scanf("%d", &m);
+		while (m--) {
+			int type, l, r;
+			scanf("%d %d %d", &type, &l, &r);
+			if (type == 1) {
+				updata(root, l - 1, r);
+				printf("%lld\n", find(root, l - 1, r));
+			}
+			else {
+				lazy(root, l - 1, r);
+			}
+		}
+		Free(root);
+	}
+	return 0;
+}
+
+long long int Insert(long long int * kirby, tree_line ** root, int head, int tail) {
+	tree_line ** temp = root;
+	(*temp)->ll = head;
+	(*temp)->rr = tail;
+	(*temp)->sqrt_lazy = 0;
+	if (tail - 1 == head) {
+		(*temp)->message = kirby[head];
+		(*temp)->_10_ = (*temp)->message == 1 ? false : true;
+		(*temp)->left = (*temp)->right = NULL;
+		return (*temp)->message;
+	}
+	else {
+		(*root)->left = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->right = (tree_line*)malloc(sizeof(tree_line));
+		(*root)->message = Insert(kirby, &((*root)->left), head, (head + tail) / 2) + Insert(kirby, &((*root)->right), (head + tail) / 2, tail);
+		if ((*temp)->left->_10_ || (*temp)->right->_10_) {
+			(*temp)->_10_ = true;
+		}
+		else {
+			(*temp)->_10_ = false;
+		}
+	}
+}
+
+void lazy(tree_line * root, int head, int tail) {
+	tree_line * temp = root;
+	if (temp->_10_) {
+		if (head >= temp->rr || tail <= temp->ll) {
+			return;
+		}
+		else if ((head <= temp->ll&&tail >= temp->rr) ||
+			(head <= temp->ll&&tail >= temp->rr)) {
+			temp->sqrt_lazy++;
+			return;
+		}
+		else {
+			lazy(temp->left, head, tail);
+			lazy(temp->right, head, tail);
+		}
+	}
+	else {
+		return;
+	}
+}
+
+void updata(tree_line * root, int head, int tail) {
+	tree_line * temp = root;
+	if (head >= temp->rr || tail <= temp->ll) {
+		return;
+	}
+	else if ((head <= temp->ll&&tail >= temp->rr) ||
+		(head <= temp->ll&&tail >= temp->rr)) {
+		Deep_updata(temp, temp->ll, temp->rr, temp->sqrt_lazy);
+		return;
+	}
+	else {
+		updata(temp->left, head, tail);
+		updata(temp->right, head, tail);
+	}
+}
+
+long long int Deep_updata(tree_line * root, int head, int tail, int n) {
+	tree_line * temp = root;
+	temp->sqrt_lazy = 0;
+	if (temp->ll == temp->rr - 1) {
+		temp->message = (long long int)pow(temp->message,pow(0.5, n));
+		if (temp->message == 1){
+			temp->_10_ = false;
+		}
+		return temp->message;
+	}
+	else {
+		temp->message = Deep_updata(temp->left, head, tail, n + temp->left->sqrt_lazy) + 
+			Deep_updata(temp->right, head, tail, n + temp->right->sqrt_lazy);
+		if (temp->left->_10_ || temp->right->_10_) {
+			temp->_10_ = true;
+		}
+		else {
+			temp->_10_ = false;
+		}
+		return temp->message;
+	}
+}
+
+long long int find(tree_line * root, int head, int tail) {
+	tree_line * temp = root;
+	if (head >= temp->rr || tail <= temp->ll) {
+		return 0;
+	}
+	else if ((head <= temp->ll&&tail >= temp->rr) ||
+		(head <= temp->ll&&tail >= temp->rr)) {
+		return temp->message;
+	}
+	else {
+		return find(temp->left, head, tail) + find(temp->right, head, tail);
+	}
+}
+
+void Free(tree_line * root) {
+	if (root->left != NULL) {
+		Free(root->left);
+	}
+	if (root->right != NULL) {
+		Free(root->right);
+	}
+	free(root);
+}
