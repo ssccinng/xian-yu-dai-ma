@@ -1,0 +1,41 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+int lowbit(int x) {
+	return x&-x;
+}
+
+void Create(int * kirby, int N) {
+	for (int i = 1; i <= N; i++) {
+		int a = lowbit(i) >> 1;
+		while (a > 0) {
+			kirby[i - 1] += kirby[i - a - 1];
+			a >>= 1;
+		}
+	}
+}
+
+int main(int argc, char * argv[]) {
+	int N;
+	scanf_s("%d", &N);
+	int * kirby;
+	kirby = (int*)malloc(N * sizeof(int));
+	for (int i = 0; i < N; i++) {
+		scanf_s("%d", &kirby[i]);
+	}
+	Create(kirby, N);
+	for (int i = 0; i < N; i++) {
+		printf("%-5d", kirby[i]);
+	}
+	printf("\n");
+	int index;
+	while (scanf_s("%d", &index), index != -1) {
+		int sum = 0;
+		while (index != 0) {
+			sum += kirby[index - 1];
+			index -= lowbit(index);
+		}
+		printf("%d\n", sum);
+	}
+	return 0;
+}
