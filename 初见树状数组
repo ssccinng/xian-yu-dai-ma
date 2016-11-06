@@ -1,0 +1,34 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define max 320
+
+int kirby[max];
+
+int lowbit(int x) {
+	return x&-x;
+}
+
+int main(int argc, char * argv[]) {
+	for (int i = 0; i < max; i++) {
+		kirby[i] = i + 1;
+	}
+	int tree[max] = { 0 };
+	for (int i = 1; i <= max; i++) {
+		int t = i;
+		int a = lowbit(t);
+		a >>= 1;
+		tree[i - 1] = kirby[i - 1];
+		while (a > 0) {
+			tree[i - 1] += tree[t - a - 1];
+			a /= 2;
+		}
+	}
+	for (int i = 0; i < max; i++) {
+		printf("%-5d", kirby[i]);
+	}
+	printf("\n");
+	for (int i = 0; i < max; i++) {
+		printf("%-5d", tree[i]);
+	}
+	return 0;
+}
