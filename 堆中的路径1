@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct file {
+	int * message;
+	int NowSize;
+} MinFile;
+
+int main(int argc, char *argv[]) {
+	int N, T, X;
+	scanf("%d %d", &N, &T);
+	MinFile * root = NULL;
+	root = (MinFile*)malloc(sizeof(MinFile));
+	root->message = (int*)malloc((N + 1) * sizeof(int));
+	root->message[0] = -20000;
+	root->NowSize = N;
+	for (int i = 1; i <= N; ++i) {
+		scanf("%d ", &X);
+		int j = i;
+		for (; root->message[j / 2] > X; j /= 2) {
+			root->message[j] = root->message[j / 2];
+		}
+		root->message[j] = X;
+	}
+	while (T--) {
+		scanf("%d", &X);
+		while (X > 0) {
+			printf("%d%c", root->message[X], X == 1 ? '\n' : ' ');
+			X /= 2;
+		}
+	}
+	return 0;
+}
