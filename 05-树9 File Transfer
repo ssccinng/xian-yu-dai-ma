@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct find_c {
+	int number;
+	struct find_c * parent;
+} File;
+
+int check(File * a, File * b);
+void input(File * a, File * b);
+
+int main(int argc, char * argv[]) {
+	int N;
+	scanf("%d", &N);
+	File * kirby = (File*)malloc((N + 1) * sizeof(File));
+	for (int i = 0; i <= N; ++i) {
+		kirby[i].number = 1;
+		kirby[i].parent = NULL;
+	}
+	char n;
+	int a, b;
+	while (scanf("\n%c", &n, 1), n != 'S') {
+		scanf("%d %d", &a, &b);
+		if (n == 'C') {
+			if (check(&kirby[a], &kirby[b])) {
+				printf("yes\n");
+			}
+			else {
+				printf("no\n");
+			}
+		}
+		if (n == 'I') {
+			input(&kirby[a], &kirby[b]);
+		}
+	}
+	int cnt = 0;
+	for (int i = 1; i <= N; ++i) {
+		if (kirby[i].parent == NULL) {
+			++cnt;
+		}
+	}
+	if (cnt == 1) {
+		printf("The network is connected.");
+	}
+	else {
+		printf("There are %d components.", cnt);
+	}
+	return 0;
+}
+
+int check(File * a, File * b) {
+	File * stack_a[100] = { 0 };
+	File * stack_b[100] = { 0 };
+	int index_a = -1, index_b = -1;
+	while (a->parent != NULL) {
+		stack_a[++index_a] = a;
+		a->parent += a->number;
+		a->number = 0;
+		a = a->parent;
+	}
+	while (b->parent != NULL) {
+		stack_b[++index_b] = b;
+		b->parent += b->number;
+		b->number = 0;
+		b = b->parent;
+	}
+	for (int i = 0; i <= index_a; ++i) {
+		stack_a[i]->parent = a;
+	}
+	for (int i = 0; i <= index_b; ++i) {
+		stack_b[i]->parent = b;
+	}
+	return a == b ? a->number : 0;
+}
+
+void input(File * a, File * b) {
+	int num;
+	if (num = check(a, b)) {
+		return;
+	}
+	else {
+		while (a->parent != NULL) {
+			a = a->parent;
+		}
+		while (b->parent != NULL) {
+			b = b->parent;
+		}
+		b->number += a->number;
+		a->number = 0;
+		a->parent = b;
+	}
+}
