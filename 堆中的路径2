@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define scanf scanf_s
+
+typedef struct file {
+	int * message;
+	int NowSize;
+} MinFile;
+
+MinFile * Create(int n) {
+	MinFile * root = (MinFile*)malloc(sizeof(MinFile));
+	root->message = (int*)malloc((n + 1) * sizeof(int));
+	root->message[0] = 20000;
+	root->NowSize = n;
+	for (int i = 1; i <= n; ++i) {
+		scanf("%d", &root->message[i]);
+	}
+	int zqd = n / 2;
+	int chird, temp;
+	while (zqd > 0) {
+		temp = root->message[zqd];
+		int kirby = zqd;
+		while (2 * kirby <= root->NowSize){
+			chird = 2 * kirby;
+			if (chird != root->NowSize &&
+				root->message[chird + 1] < root->message[chird]) {
+				++chird;
+			}
+			if (temp < root->message[chird]) {
+				break;
+			}
+			else {
+				root->message[kirby] = root->message[chird];
+			}
+			kirby = chird;
+		}
+		root->message[kirby] = temp;
+		--zqd;
+	}
+	return root;
+}
+
+int main(int argc, char *argv[]) {
+	int N, T, X;
+	scanf("%d %d", &N, &T);
+	MinFile * root = NULL;
+	root = Create(N);
+	for (int i = 1; i <= N; ++i) {
+		printf("%d ", root->message[i]);
+	}
+	while (T--) {
+		scanf("%d", &X);
+		while (X > 0) {
+			printf("%d%c", root->message[X], X == 1 ? '\n' : ' ');
+			X /= 2;
+		}
+	}
+	return 0;
+}
