@@ -1,0 +1,124 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+
+typedef struct tree_bin {
+	int message;
+	int avg;
+	int tag;
+	struct tree_bin *left, *right;
+} AVL;
+
+AVL * Insert(AVL * root, int message);
+AVL * Mindleft(AVL * A, AVL * B);
+AVL * Mindright(AVL * A, AVL * B);
+
+int main(int argc, char * argv[]) {
+	int N, t;
+	AVL * root = NULL;
+	scanf("%d", &N);
+	for (int i = 0; i < N; ++i){
+		scanf("%d", &t);
+		root = Insert(root, t);
+	}
+	printf("%d\n", root->message);
+	return 0;
+}
+
+AVL * Insert(AVL * root, int message) {
+	AVL ** temp = &root;
+	int tag = -1;
+	AVL ** kirby[100];
+	while ((*temp) != NULL) {
+		if ((*temp)->message > message) {
+			kirby[++tag] = temp;
+			temp = &((*temp)->left);
+		}
+		else if ((*temp)->message < message) {
+			kirby[++tag] = temp;
+			temp = &((*temp)->right);
+		}
+		else {
+			(*temp)->tag++;
+			return root;
+		}
+	}
+	(*temp) = (AVL*)malloc(sizeof(AVL));
+	(*temp)->avg = 0;
+	(*temp)->message = message;
+	(*temp)->left = (*temp)->right = NULL;
+	(*temp)->tag = 1;
+	kirby[++tag] = temp;
+	tag--;
+	while (tag != -1) {
+		if ((*kirby[tag])->message > (*kirby[tag + 1])->message) {
+			(*kirby[tag])->avg++;
+		}
+		if ((*kirby[tag])->message < (*kirby[tag + 1])->message) {
+			(*kirby[tag])->avg--;
+		}
+		if ((*kirby[tag])->avg == 2 || (*kirby[tag])->avg == -2 || (*kirby[tag])->avg == 0) {
+			break;
+		}
+		tag--;
+	}
+	if (tag == -1 || (*kirby[tag])->avg == 0) {
+		return root;
+	}
+	if ((*kirby[tag])->avg == 2){
+		if ((*kirby[tag + 1])->avg == 1) {
+			(*kirby[tag])->avg = (*kirby[tag + 1])->avg = 0;
+			(*kirby[tag]) = Mindleft((*kirby[tag]), (*kirby[tag + 1]));
+		}
+		else {
+			if ((*kirby[tag + 2])->avg == 1) {
+				(*kirby[tag + 1])->avg = 0;
+				(*kirby[tag])->avg = -1;
+			}
+			else if ((*kirby[tag + 2])->avg == -1){
+				(*kirby[tag + 1])->avg = 1;
+				(*kirby[tag])->avg = 0;
+			}
+			else {
+				(*kirby[tag])->avg = (*kirby[tag + 1])->avg = 0;
+			}
+			(*kirby[tag + 2])->avg = 0;
+			(*kirby[tag + 1]) = Mindright((*kirby[tag + 1]), (*kirby[tag + 2]));
+			(*kirby[tag]) = Mindleft((*kirby[tag]), (*kirby[tag + 1]));
+		}
+	}
+	else if ((*kirby[tag])->avg == -2) {
+		if ((*kirby[tag + 1])->avg == -1) {
+			(*kirby[tag])->avg = (*kirby[tag + 1])->avg = 0;
+			(*kirby[tag]) = Mindright((*kirby[tag]), (*kirby[tag + 1]));
+		}
+		else {
+			if ((*kirby[tag + 2])->avg == -1) {
+				(*kirby[tag + 1])->avg = 0;
+				(*kirby[tag])->avg = 1;
+			}
+			else if ((*kirby[tag + 2])->avg == 1){
+				(*kirby[tag + 1])->avg = -1;
+				(*kirby[tag])->avg = 0;
+			}else {
+				(*kirby[tag])->avg = (*kirby[tag + 1])->avg = 0;
+			}
+			(*kirby[tag + 2])->avg = 0;
+			(*kirby[tag + 1]) = Mindleft((*kirby[tag + 1]), (*kirby[tag + 2]));
+			(*kirby[tag]) = Mindright((*kirby[tag]), (*kirby[tag + 1]));
+		}
+	}
+	return root;
+}
+
+AVL * Mindleft(AVL * A, AVL * B) {
+	A->left = B->right;
+	B->right = A;
+	return B;
+}
+
+AVL * Mindright(AVL * A, AVL * B) {
+	A->right = B->left;
+	B->left = A;
+	return B;
+}
