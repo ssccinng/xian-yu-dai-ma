@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+	
+typedef struct que{
+	int message;
+	struct que * Next;
+} queue;
+
+void DFS(int ** kirby, int E, int N);
+void BFS(int ** kirby, int N);
+void push(int i);
+int pop();
+
+bool visited[10];
+queue * head;
+queue * tail = head;
+
+int main(){
+	int N, E, a, b;
+	scanf("%d %d", &N, &E);
+	int ** kirby = (int**)malloc(N * sizeof(int*));
+	for (int i = 0; i < N; ++i){
+		kirby[i] = (int*)malloc(N * sizeof(int));
+		memset(kirby[i], 0, N * sizeof(int));
+	}
+	for (int i = 0; i < E; ++i){
+		scanf("%d %d", &a, &b);
+		kirby[a][b] = kirby[b][a] = 1;
+	}
+	for (int i = 0; i < N; ++i){
+		if (!visited[i]){
+			printf("{");
+			DFS(kirby, i, N);
+			printf(" }\n");
+		}
+	}
+	memset(visited, false, N * sizeof(bool));
+	for (int i = 0; i < N; ++i){
+		if (!visited[i]){
+			printf("{");
+			head = (queue*)malloc(sizeof(queue));
+			head->message = i;
+			head->Next = NULL;
+			BFS(kirby, N);
+			printf(" }\n");
+		}
+	}
+	return 0;
+}
+
+void DFS(int ** kirby, int E, int N){
+	visited[E] = true;
+	printf(" %d", E);
+	for (int i = 0; i < N; ++i){
+		if (kirby[E][i]){
+			if (!visited[i]){
+				DFS(kirby, i, N);
+			}
+		}
+	}
+}
+
+void BFS(int ** kirby, int N){
+	int E = pop();
+	visited[E] = true;
+	printf(" %d", E);
+	for (int i = 0; i < N; ++i){
+		if (kirby[E][i]){
+			if (!visited[i]){
+				push(i);
+			}
+		}
+	}
+	if (head != NULL){
+		BFS(kirby, N);
+	}
+}
+
+void push(int i){
+	visited[i] = true;
+	if (head == NULL){
+		head = (queue*)malloc(sizeof(queue));
+		head->message = i;
+		head->Next = NULL;
+		tail = head;
+		return;
+	}
+	tail->Next = (queue*)malloc(sizeof(queue));
+	tail = tail->Next;
+	tail->message = i;
+	tail->Next = NULL;
+}
+
+int pop(){
+	queue * t = head;
+	int a = head->message;
+	head = head->Next;
+	free(t);
+	return a;
+}
+
+
+
+
+
+
+
+
