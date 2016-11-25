@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct table {
+	int message;
+	struct table * Next;
+} arr_table;
+
+typedef struct que {
+	int message;
+	struct que * Next;
+} queue;
+
+bool visited[10010];
+queue * head = NULL;
+queue * tail = head;
+int count = 0;
+
+void Table_Insert(arr_table ** kirby, int b);
+void BFS(arr_table ** kirby);
+void Push(int i);
+int Pop();
+
+int main(int argc, char * argv[]) {
+	int N, M;
+	scanf("%d %d", &N, &M);
+	arr_table ** kirby = (arr_table**)malloc((N + 1) * sizeof(arr_table*));
+	for (int i = 0; i <= N; ++i) {
+		kirby[i] = NULL;
+	}
+	int a, b;
+	for (int i = 0; i < M; ++i) {
+		scanf("%d %d", &a, &b);
+		Table_Insert(&kirby[a], b);
+		Table_Insert(&kirby[b], a);
+	}
+	for (int i = 1; i <= N; ++i) {
+		memset(visited, false, sizeof(visited));
+		Push(i);
+		Push(-1);
+		for (int j = 0; j < 6; ++j) {
+			while (head->message != -1) {//特殊节点
+				BFS(kirby);
+			}
+			Push(-1);
+			Pop();
+		}
+		printf("%d: %.2f%%\n", i, count * 100.0 / N);
+		count = 0;
+		queue * temp = head;
+		while (head != NULL) {
+			head = head->Next;
+			free(temp);
+			temp = head;
+		}
+	}
+	return 0;
+}
+
+void Table_Insert(arr_table ** kirby, int b) {
+	arr_table * temp = *kirby;
+	(*kirby) = (arr_table*)malloc(sizeof(arr_table));
+	(*kirby)->message = b;
+	(*kirby)->Next = temp;
+}
+
+void BFS(arr_table ** kirby) {
+	int E = Pop();
+	arr_table * temp = kirby[E];
+	while (temp != NULL) {
+		if (!visited[temp->message]) {
+			Push(temp->message);
+		}
+		temp = temp->Next;
+	}
+}
+
+void Push(int x) {
+	if (x != -1){
+		count++;
+		visited[x] = true;
+	}
+	if (head == NULL) {
+		head = (queue*)malloc(sizeof(queue));
+		tail = head;
+	}
+	else {
+		tail->Next = (queue*)malloc(sizeof(queue));
+		tail = tail->Next;
+	}
+	tail->message = x;
+	tail->Next = NULL;
+}
+
+int Pop() {
+	queue * t = head;
+	int t1 = t->message;
+	head = head->Next;
+	free(t);
+	return t1;
+}
