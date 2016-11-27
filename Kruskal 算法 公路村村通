@@ -1,0 +1,138 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define scanf scanf_s
+#define OurVillage(x) Village.Road_Min_Heap[x]
+#define Our_Village(x) Village->Road_Min_Heap[x]
+#define Inf 0x7fffffff
+#define Size Village->Nowsize
+#define father All_Tree[Village].parent
+
+typedef struct Union {
+	int parent;
+} Union;
+
+typedef struct Edge {
+	int Village1, Village2;
+	int Price;
+} Edge;
+
+typedef struct Heap {
+	Edge * Road_Min_Heap;
+	int Nowsize;
+} MinHeap;
+
+void Change(MinHeap * Village);
+Edge Delete(MinHeap * Village);
+int Find_Root(Union * All_Tree, int Village);
+void Kruskal(MinHeap * Village, Union * All_Tree, int N);
+
+int main(int argc, char * argv[]) {
+	int N, M;
+	scanf("%d %d", &N, &M);
+	Union * All_Tree = (Union*)malloc((N + 1) * sizeof(Union));
+	MinHeap Village;
+	for (int i = 0; i < N + 1; ++i) {
+		All_Tree[i].parent = -1;
+	}
+	Village.Road_Min_Heap = (Edge*)malloc((M + 1)* sizeof(Edge));
+	Village.Road_Min_Heap[0].Price = -Inf;
+	Village.Nowsize = M;
+	for (int i = 1; i <= M; ++i) {
+		scanf("%d %d %d", &OurVillage(i).Village1, &OurVillage(i).Village2, &OurVillage(i).Price);
+	}
+	//for (int i = 0; i <= Village.Nowsize; ++i) {
+	//	printf("%d ", Village.Road_Min_Heap[i].Price);
+	//}
+	//printf("\n");
+	Change(&Village);
+	//for (int i = 0; i <= Village.Nowsize; ++i) {
+	//	printf("%d ", Village.Road_Min_Heap[i].Price);
+	//}
+	//printf("\n");
+	Kruskal(&Village, All_Tree, N);
+	return 0;
+}
+
+void Change(MinHeap * Village) {
+	int parent, chird;
+	int root = Size / 2;
+	Edge temp;
+	for (; root > 0; --root) {
+		parent = root;
+		temp = Our_Village(root);
+		for (; 2 * parent <= Size; parent = chird) {
+			chird = 2 * parent;
+			if (chird < Size && Our_Village(chird).Price > Our_Village(chird + 1).Price) {
+				++chird;
+			}
+			if (temp.Price <= Our_Village(chird).Price) { 
+				break;
+			}
+			else {
+				Our_Village(parent) = Our_Village(chird);
+			}
+			//for (int i = 0; i <= Village->Nowsize; ++i) {
+			//	printf("%d ", Village->Road_Min_Heap[i].Price);
+			//}
+			//printf("\n");
+		}
+		Our_Village(parent) = temp;
+	}
+}
+
+Edge Delete(MinHeap * Village) {
+	Edge temp = Our_Village(1);
+	if (Size == 0) {
+		temp.Price = 0;
+		return temp;
+	}
+	Edge Min = Our_Village(Size);
+	--Size;
+	int parent = 1, chird;
+	for (; 2 * parent <= Size; parent = chird) {
+		chird = 2 * parent;
+		if (2 * parent < Size && Our_Village(chird).Price > Our_Village(chird + 1).Price) {
+			++chird;
+		}
+		if (Min.Price <= Our_Village(chird).Price) {
+			break;
+		}
+		else {
+			Our_Village(parent) = Our_Village(chird);
+		}
+	}
+	Our_Village(parent) = Min;
+	return temp;
+}
+
+int Find_Root(Union * All_Tree, int Village) {
+	if (father < 0) {
+		return Village;
+	}
+	else {
+		return father = Find_Root(All_Tree, father);
+	}
+}
+
+void Kruskal(MinHeap * Village, Union * All_Tree, int N) {
+	int Edge_cnt = 0;
+	Edge MinE;
+	int sum = 0;
+	int Village1, Village2;
+	while (Edge_cnt < N - 1 && (MinE = Delete(Village)).Price) {
+		Village1 = Find_Root(All_Tree, MinE.Village1);
+		Village2 = Find_Root(All_Tree, MinE.Village2);
+		if (Village1 != Village2) {
+			All_Tree[Village1].parent = Village2;
+			++Edge_cnt;
+			sum += MinE.Price;
+		}
+	}
+	if (Edge_cnt != N - 1) {
+		printf("-1\n");
+	}
+	else {
+		printf("%d\n", sum);
+	}
+}
