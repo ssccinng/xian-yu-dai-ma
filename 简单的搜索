@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define Inf 0x7fffffff
+#define Movex task[temp.x][temp.y].Teleport_x
+#define Movey task[temp.x][temp.y].Teleport_y
+
+typedef struct _xy_ {
+	bool fin;
+	int Teleport_x, Teleport_y;
+} Graph;
+
+typedef struct Que {
+	int x, y, k;
+	struct Que * Next;
+} Queue;
+
+typedef struct Teleport {
+	int x, y;
+} Portal;
+
+typedef struct Check {
+	int x, y, k;
+} Check;
+
+bool Visited[27][110][110];
+int Sceond[27][110][110];
+Graph task[110][110];
+Queue *Head = NULL, *Tail;
+
+void Push(int x, int y, int k);
+Check Pop();
+void BFS();
+void visited(int x, int y, int $x, int $y, int k);
+
+int main() {
+	int n, m, k;
+	while (scanf("%d %d %d", &n, &m, &k), n) {//设墙
+		getchar();
+		Portal * Save = (Portal*)malloc(26 * sizeof(Portal));
+		memset(Save, 0, 26 * sizeof(Portal));
+		memset(task, 0, 110 * 110 * sizeof(Graph));
+		memset(Visited, false, 27 * 110 * 110 * sizeof(bool));
+		memset(Sceond, 7, 27 * 110 * 110 * sizeof(int));
+		for (int i = 0; i <= m + 1; ++i) {
+			for (int j = 0; j < 27; ++j) {
+				Visited[j][0][i] = Visited[j][n + 1][i] = true;
+			}
+		}
+		for (int i = 1; i <= n; ++i) {
+			for (int j = 0; j < 27; ++j) {
+				Visited[j][i][0] = Visited[j][i][m + 1] = true;
+			}
+		}
+		char a;
+		int End_x, End_y;
+		for (int i = 1; i <= n; ++i) {
+			for (int j = 1; j <= m; ++j) {
+				a = getchar();
+				if (a == '*') {
+					task[i][j].Teleport_x = task[i][j].Teleport_y = 0;
+					task[i][j].fin = false;
+				}
+				if ('a' <= a&&a <= 'z') {
+					task[i][j].fin = false;
+					if (Save[a - 'a'].x == 0) {
+						Save[a - 'a'].x = i;
+						Save[a - 'a'].y = j;
+					}
+					else {
+						task[i][j].Teleport_x = Save[a - 'a'].x;
+						task[i][j].Teleport_y = Save[a - 'a'].y;
+						task[Save[a - 'a'].x][Save[a - 'a'].y].Teleport_x = i;
+						task[Save[a - 'a'].x][Save[a - 'a'].y].Teleport_y = j;
+					}
+				}
+				if (a == '$') {
+					task[i][j].Teleport_x = task[i][j].Teleport_y = 0;
+					End_x = i;
+					End_y = j;
+					task[i][j].fin = true;
+				}
+				if (a == '@') {
+					task[i][j].Teleport_x = task[i][j].Teleport_y = 0;
+					task[i][j].fin = false;
+					Push(i, j, k);
+					Sceond[k][i][j] = 0;
+					Visited[k][i][j] = true;
+				}
+			}
+			getchar();
+		}
+		BFS();
+		int ans = Inf;
+		for (int i = k; i >= 0; --i) {
+			if (ans > Sceond[i][End_x][End_y]) {
+				ans = Sceond[i][End_x][End_y];
+			}
+		}
+
+		while (Head != NULL) {
+			Tail = Head;
+			Head = Head->Next;
+			free(Tail);
+		}
+		printf("%d\n", ans);
+	}
+	return 0;
+}
+
+void Push(int x, int y, int k) {
+	if (Head == NULL) {
+		Head = (Queue*)malloc(sizeof(Queue));
+		Tail = Head;
+	}
+	else {
+		Tail->Next = (Queue*)malloc(sizeof(Queue));
+		Tail = Tail->Next;
+	}
+	Tail->x = x;
+	Tail->y = y;
+	Tail->k = k;
+	Tail->Next = NULL;
+}
+
+Check Pop() {
+	Check arr;
+	//arr.x = arr.y = arr.k = 0;
+	//if (Head == NULL) return arr;
+	arr.x = Head->x;
+	arr.y = Head->y;
+	arr.k = Head->k;
+	Queue * temp = Head;
+	Head = Head->Next;
+	free(temp);
+	return arr;
+}
+
+void BFS() {
+	Check temp;
+	while (temp = Pop(), !task[temp.x][temp.y].fin) {
+		visited(temp.x - 1, temp.y, temp.x, temp.y, temp.k);
+		visited(temp.x + 1, temp.y, temp.x, temp.y, temp.k);
+		visited(temp.x, temp.y - 1, temp.x, temp.y, temp.k);
+		visited(temp.x, temp.y + 1, temp.x, temp.y, temp.k);
+		if (temp.k >= 1) {
+			if (Movex != 0 &&
+				!Visited[temp.k - 1][Movex][Movey]) {
+				Visited[temp.k - 1][Movex][Movey] = true;
+				Push(Movex, Movey, temp.k - 1);
+				Sceond[temp.k - 1][Movex][Movey] = Sceond[temp.k][temp.x][temp.y] + 1;
+			}
+		}
+	}
+}
+
+void visited(int x, int y, int $x, int $y, int k) {
+	//if (k == 0 && task[x][y].Teleport_x != 0) return;
+	if (!Visited[k][x][y]) {
+		Visited[k][x][y] = true;
+		Sceond[k][x][y] = Sceond[k][$x][$y] + 1;//传送次数大的到底要不要保留....
+		Push(x, y, k);
+	}
+}
