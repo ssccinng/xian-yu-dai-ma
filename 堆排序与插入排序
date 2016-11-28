@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define Size _Heap->Nowsize
+#define Waiting(x) _Heap->sort[x]
+
+#define Inf 0x7fffffff
+
+typedef struct Heap {
+	int * sort;
+	int Nowsize;
+} MaxHeap;
+
+bool Complete(int * Stand, int * sorting, int N);//堆排记得+1
+void Insert_sort(int * _Insert, int Index);
+void Heap_sort(MaxHeap * _Heap);
+void BuildMaxHeap(MaxHeap * _Heap);
+void Change(MaxHeap * _Heap);
+void Print_sort(int * sorted, int N);
+
+int main(int argc, char * argv[]) {
+	int N;
+	scanf("%d", &N);
+	int * _Insert = (int*)malloc((N + 1) * sizeof(int));
+	int * Stand = (int*)malloc(N * sizeof(int));
+	MaxHeap _Heap;
+	_Heap.sort = (int*)malloc((N + 1) * sizeof(int));
+	_Heap.Nowsize = N;
+	_Heap.sort[0] = Inf;
+	_Insert[0] = -Inf;
+	for (int i = 1; i <= N; ++i) {
+		scanf("%d", &_Insert[i]);
+		_Heap.sort[i] = _Insert[i];
+	}
+	for (int i = 0; i < N; ++i) {
+		scanf("%d", &Stand[i]);
+	}
+	BuildMaxHeap(&_Heap);
+	for (int i = 1; i < N; ++i) {
+		Insert_sort(&_Insert[1], i);
+		//Print_sort(_Insert, N);
+		//printf("\n");
+		Heap_sort(&_Heap);
+		//Print_sort(_Heap.sort, N);
+		//printf("\n");
+		if (Complete(Stand, &_Insert[1], N)) {
+			printf("Insertion Sort\n");
+			Insert_sort(&_Insert[1], i + 1);
+			Print_sort(_Insert, N);
+			return 0;
+		}
+		if (Complete(Stand, &_Heap.sort[1], N)) {
+			printf("Heap Sort\n");
+			Heap_sort(&_Heap);
+			Print_sort(_Heap.sort, N);
+			return 0;
+		}
+	}
+	return 0;
+}
+
+bool Complete(int * Stand, int * sorting, int N) {
+	for (int i = 0; i < N; ++i) {
+		if (Stand[i] != sorting[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void Insert_sort(int * _Insert, int Index) {//看情况定轮数
+	int temp = _Insert[Index];
+	for (int i = Index; i >= 0; --i) {
+		if (temp >= _Insert[i - 1]) {
+			_Insert[i] = temp;
+			break;
+		}
+		else {
+			_Insert[i] = _Insert[i - 1];
+		}
+	}
+}
+
+void Heap_sort(MaxHeap * _Heap) {
+	int temp;
+	temp = Waiting(1);
+	Waiting(1) = Waiting(Size);
+	Waiting(Size--) = temp;
+	Change(_Heap);
+}
+
+void BuildMaxHeap(MaxHeap * _Heap) {
+	int parent, chird;
+	int root = Size / 2;
+	int temp;
+	for (; root > 0; --root) {
+		parent = root;
+		temp = Waiting(root);
+		for (; 2 * parent <= Size; parent = chird) {
+			chird = 2 * parent;
+			if (chird < Size && Waiting(chird) < Waiting(chird + 1)) {
+				++chird;
+			}
+			if (temp >= Waiting(chird)) {
+				break;
+			}
+			else {
+				Waiting(parent) = Waiting(chird);
+			}
+		}
+		Waiting(parent) = temp;
+	}
+}
+
+void Change(MaxHeap * _Heap) {
+	int parent = 1, chird;
+	int temp = Waiting(1);
+	for (; 2 * parent <= Size; parent = chird) {
+		chird = 2 * parent;
+		if (chird < Size && Waiting(chird) < Waiting(chird + 1)) {
+			++chird;
+		}
+		if (temp >= Waiting(chird)) {
+			break;
+		}
+		else {
+			Waiting(parent) = Waiting(chird);
+		}
+	}
+	Waiting(parent) = temp;
+}
+
+void Print_sort(int * sorted, int N) {
+	printf("%d", sorted[1]);
+	for (int i = 2; i <= N; ++i) {
+		printf(" %d", sorted[i]);
+	}
+}
