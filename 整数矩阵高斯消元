@@ -41,15 +41,20 @@ int main(int argc, char * argv[]) {
 				update(Marix, i, j, i, M);
 			}
 		}
-		for (int i = 0; i < N; ++i) {
-			for (int j = 0; j < M; ++j) {
-				printf("%-6.2f", Marix[i][j].a * 1. / Marix[i][j].b);
-			}
-			printf("\n");
-		}
-		printf("\n\n\n");
 	}
-	
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < M; ++j) {
+			printf("%-10.2f", Marix[i][j].a * 1. / Marix[i][j].b);
+		}
+		printf("\n");
+	}
+	double sum = 1;
+	if (N == M) {
+		for (int i = 0; i < N; ++i) {
+			sum *= Marix[i][i].a * 1. / Marix[i][i].b;
+		}
+		printf("行列式为：%.2f", sum);
+	} 
 	return 0;
 }
 
