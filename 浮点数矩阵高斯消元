@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+void Change_Line(double ** Marix, double * temp, int x, int y, int M);
+int Check_c(double ** Marix, int x, int N);
+void update(double ** Marix, int x, int y, int start, int M);
+
+int main(int argc, char * argv[]) {
+	int N, M;
+	printf("请输入矩阵大小\n"); 
+	scanf("%d %d", &N, &M);
+	double * sour = new double[N * M];
+	double ** Marix = new double * [N];
+	for (int i = 0; i < N; ++i) {
+		Marix[i] = sour + i * M;
+	}
+	printf("请输入矩阵\n"); 
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < M; ++j) {
+			scanf("%lf", &Marix[i][j]);
+		}
+	}
+	double * temp = new double[M];
+	for (int i = 0; i < M; ++i) {
+		int row = Check_c(Marix, i, N);
+		if (row < N) {
+			if (row != i) Change_Line(Marix, temp, row, i, M);
+			for (int j = i + 1; j < N; ++j) {
+				update(Marix, i, j, i, M);
+			}
+		}
+	}
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < M; ++j) {
+			printf("%-6.2f", Marix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n\n\n");
+	if (N == M) {
+		double sum = 1;
+		for (int i = 0; i < N; ++i) {
+			sum *= Marix[i][i];
+		}
+		printf("方阵行列式为:%-6.2f\n\n", sum);
+	}
+	return 0;
+}
+
+void Change_Line(double ** Marix, double * temp, int x, int y, int M) {
+	for (int i = 0; i < M; ++i) {
+		temp[i] = Marix[x][i];
+		Marix[x][i] = Marix[y][i];
+		Marix[y][i] = temp[i];
+	}
+}
+
+int Check_c(double ** Marix, int x, int N) {
+	int i;
+	for (i = x; i < N; ++i) {
+		if (fabs(Marix[i][x]) > 0.000001) break;
+	}
+	return i;
+}
+
+void update(double ** Marix, int x, int y, int start, int M) {
+	if (fabs(Marix[y][start]) < 0.000001) return;
+	double temp = Marix[y][start] / Marix[x][start];
+	for (int i = start + 1; i < M; ++i) {
+		Marix[y][i] -= temp * Marix[x][i];
+	}
+	Marix[y][start] = 0;
+}
