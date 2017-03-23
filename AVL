@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <Algorithm>
+using namespace std;
+
+typedef struct Tree AVL;
+typedef struct Tree BST;
+
+struct Tree {
+	int Value;
+	int Height = 0;
+	int Tag = 1;
+	BST *Left = NULL, *Right = NULL;
+};
+
+AVL * AVL_Insert(AVL * Root, int Value);
+void AVLInsert(AVL * &Root, int Value);
+void Print_Tree(AVL * Root);
+void Delete_Tree(AVL * Root);
+AVL * SingleLeftRotation(AVL * Root);
+AVL * DoubleLeftRightRotation(AVL * Root);
+AVL * SingleRightRotation(AVL * Root);
+AVL * DoubleRightLeftRotation(AVL * Root);
+int GetHeight(AVL * Root);
+
+int main(int argc, char * argv[]) {
+	AVL * Root = NULL;
+	for (int i = 0; i < 100; ++i) {
+		AVLInsert(Root, i * 1000 % 997);
+	}
+	Print_Tree(Root);
+	Delete_Tree(Root);
+	return 0;
+}
+
+void AVLInsert(AVL * &Root, int Value) {
+	Root = AVL_Insert(Root, Value);
+}
+
+int GetHeight(AVL * Root) {
+	if (Root) return Root->Height;
+	else return -1;
+}
+
+AVL * AVL_Insert(AVL * Root, int Value) {
+	if (Root != NULL) {
+		if (Value > Root->Value) {
+			Root->Right = AVL_Insert(Root->Right, Value);
+			if (GetHeight(Root->Left) - GetHeight(Root->Right) == -2) {
+				if (Value > Root->Right->Value) {
+					Root = SingleRightRotation(Root);
+				}
+				else {
+					Root = DoubleRightLeftRotation(Root);
+				}
+			}
+		}
+		else if (Value < Root->Value){
+			Root->Left = AVL_Insert(Root->Left, Value);
+			if (GetHeight(Root->Left) - GetHeight(Root->Right) == 2) {
+				if (Value < Root->Left->Value) {
+					Root = SingleLeftRotation(Root);
+				}
+				else {
+					Root = DoubleLeftRightRotation(Root);
+				}
+			}
+		}
+		else {
+			Root->Tag++;
+		}
+	}
+	else {
+		Root = new AVL;
+		Root->Value = Value;
+	}
+	Root->Height = max(GetHeight(Root->Right), GetHeight(Root->Left)) + 1;
+	return Root;
+}
+
+void Print_Tree(AVL * Root) {
+	if (Root != NULL) {
+		Print_Tree(Root->Left);
+		printf("%d ", Root->Value);
+		Print_Tree(Root->Right);
+	}
+}
+
+void Delete_Tree(AVL * Root) {
+	if (Root->Left) Delete_Tree(Root->Left);
+	if (Root->Right) Delete_Tree(Root->Right);
+	free(Root);
+}
+
+AVL * SingleLeftRotation(AVL * A) {
+	AVL * B = A->Left;
+	A->Left = B->Right;
+	B->Right = A;
+	A->Height = max(GetHeight(A->Right), GetHeight(A->Left)) + 1;
+	B->Height = max(GetHeight(B->Left), A->Height) + 1;
+	return B;
+}
+
+AVL * SingleRightRotation(AVL * A) {
+	AVL * B = A->Right;
+	A->Right = B->Left;
+	B->Left = A;
+	A->Height = max(GetHeight(A->Right), GetHeight(A->Left)) + 1;
+	B->Height = max(GetHeight(B->Right), A->Height) + 1;
+	return B;
+}
+
+AVL * DoubleLeftRightRotation(AVL * A) {
+	A->Left = SingleRightRotation(A->Left);
+	return SingleLeftRotation(A);
+}
+
+AVL * DoubleRightLeftRotation(AVL * A) {
+	A->Right = SingleLeftRotation(A->Right);
+	return SingleRightRotation(A);
+}
