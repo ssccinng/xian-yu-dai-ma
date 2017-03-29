@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <algorithm>
+#include <string.h>
+#include <string>
+#define nql(x) (x ? x->nql + 1: 1)
+
+using namespace std;
+
+typedef struct Node Node;
+typedef struct Node LeftHeap;
+
+struct Node {
+	int Value;
+	int nql = 0;
+	Node *Left = NULL, *Right = NULL;
+};
+
+void Swap(int &a, int &b) {
+	int t = a;
+	a = b;
+	b = t;
+}
+
+void Swap(LeftHeap * &a, LeftHeap * &b) {
+	LeftHeap * t = a;
+	a = b;
+	b = t;
+}
+
+LeftHeap * merge (LeftHeap * &A, LeftHeap * &B) {
+	if (!A) return B;
+	if (!B) return A;
+	if (A->Value < B->Value) Swap(A, B);
+	A->Right = merge(A->Right, B);
+	if (!A->Left || nql(A->Left) < nql(A->Right)) {
+		Swap(A->Left, A->Right);
+	}
+	A->nql = nql(A->Right);
+	B = NULL;
+	return A;
+}
+
+LeftHeap * Insert(LeftHeap * &A, int Value) {
+	LeftHeap * B = new LeftHeap;
+	B->Value = Value;
+	A = merge(A, B);
+}
+
+int Pop (LeftHeap * &A) {
+	int e = A->Value;
+	LeftHeap * L = A->Left;
+	LeftHeap * R = A->Right;
+	delete A;
+	A = merge(L, R);
+	return e;
+}
+
+int main(int argc, char * argv[]) {
+	LeftHeap *A = NULL, *B = NULL;
+	for (int i = 0; i < 100; ++i) {
+		Insert(A, i * 100 % 617);
+		Insert(B, i * 300 % 317);
+	}
+	//LeftHeap *C = merge(A, B);
+	printf("A堆元素:\n");
+	while (A) printf("%d ", Pop(A));
+	printf("\nB堆元素:\n");
+	while (B) printf("%d ", Pop(B));
+	return 0;
+}
