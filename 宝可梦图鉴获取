@@ -1,0 +1,71 @@
+import requests
+import re
+import os
+import chardet
+import urllib
+import socket
+from bs4 import BeautifulSoup
+
+def gethref(html):
+    reg = r'<td> <a href="(/wiki/.[^ ]*)" title="(.*)"'
+    imgre = re.compile(reg)
+    hreflist = re.findall(imgre,html)
+    return hreflist
+
+def getImg(html):
+    reg = r'data-url="(//media.52poke.com/wiki)/thumb(/./.{2}/[0-9]{3}.[^\.]*\.png)/.[^"]*" data-srcset'
+    imgre = re.compile(reg)
+    imglist = re.findall(imgre, html)
+    return imglist
+
+URL = "https://wiki.52poke.com/wiki/%E5%AE%9D%E5%8F%AF%E6%A2%A6%E5%88%97%E8%A1%A8%EF%BC%88%E6%8C%89%E5%85%A8%E5%9B%BD%E5%9B%BE%E9%89%B4%E7%BC%96%E5%8F%B7%EF%BC%89/%E7%AE%80%E5%8D%95%E7%89%88"
+# headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}
+get = requests.get(URL)
+# requests.Timeout(300)
+get.encoding = "UTF-8"
+html = get.text
+hreflist = gethref(html)
+# print (html)
+# print (len(hreflist))
+# for i in hreflist:
+#     print (i)
+x = 1
+socket.setdefaulttimeout(30)
+for href in hreflist:
+    if x < 398:
+        x += 1
+        continue
+    print (href[0])
+    try:
+        os.makedirs('C:/Users/dell/Pictures/图鉴/编号%s %s' %(str(x), href[1]))    
+    except:
+        pass
+    finally:
+        pass
+    # + str(x) + href[1]
+    url1 = 'https://wiki.52poke.com' + href[0]
+    print (url1)
+    get1 = requests.get(url1, timeout = 30)
+    get1.encoding = "UTF-8"
+    html1 = get1.text
+    imglist = getImg(html1)
+    # print (html1)
+    # print (imglist)
+    y = 1
+    print ("第", x, "个")
+    for imgurl in imglist:
+        print ("第", y, "张")
+        utll = 'http:' + imgurl[0] + imgurl[1]
+        print (utll)
+        # urllib.urlretrieve(utll, )
+        try:
+            urllib.request.urlretrieve(utll, 'C:/Users/dell/Pictures/图鉴/编号%s %s/%s.png' %(x, href[1], y))    
+        except:
+            urllib.request.urlretrieve(utll, 'C:/Users/dell/Pictures/图鉴/编号%s %s/%s.png' %(x, href[1], y))
+        finally:
+            pass
+        
+        #urllib.urlretrieve(utll,'C:\Users\dell\Pictures\图鉴\编号\%s.png'.decode('utf-8').encode('gb2312') %(y))
+        y += 1
+    x += 1
+# print (get.text)
